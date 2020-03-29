@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adder</title>
+</head>
+<body>
+
+    <!--
+
+        This is a very simple front-end page to our simple back-end
+
+    -->
+
+    <h1>Add Actor</h1>
+
+    <form action="http://localhost:2230/actor" method="POST" name="addActor">
+        First Name: <input type="text" name="first_name"><br>
+        Last Name: <input type="text" name="last_name"><br>
+
+        Films:<br>
+        <select id="films" name="film_id" multiple style="height: 500px"></select><br>
+        <br>
+        <button type="submit">Add Actor</button>
+    </form>
+
+
+    <script>
+
+        window.onload = function() {
+            const xhr = new XMLHttpRequest()
+            xhr.onload = function() {
+                JSON.parse(xhr.responseText).results
+                    .sort((film1, film2) => {
+                        if ( film1.title === film2.title ) { return 0 }
+                        return film1.title > film2.title ? 1 : -1
+                    })
+                    .forEach(f => {
+                        const o = document.createElement('option')
+                        o.value = f.film_id
+                        o.innerHTML = f.title
+                        document.getElementById('films').appendChild(o)
+                    })
+            }
+            xhr.open("GET", "http://localhost:2230/films")
+            xhr.send()
+        }
+        
+    </script>
+    
+</body>
+</html>
