@@ -9,13 +9,23 @@
 
     <!--
 
-        This is a very simple front-end page to our simple back-end
+        This is a very simple front-end page to our simple back-end.
+
+        It uses the /films endpoint of the API to GET a list of films
+
+        It also allows the user to add a new actor by specifying a name,
+        and a number of films to which that actor will be associated.
+        Submitting the form POSTs to the /actor endpoint.
+
+        NOTE: If you are using something other than 'localhost' and port 2200
+          to serve your backend, you must make the corresponding changes here
+          in both the <form> action and the XMLHttpRequest open()
 
     -->
 
     <h1>Add Actor</h1>
 
-    <form action="http://localhost:2230/actor" method="POST" name="addActor">
+    <form action="http://localhost:2200/actor" method="POST" name="addActor">
         First Name: <input type="text" name="first_name"><br>
         Last Name: <input type="text" name="last_name"><br>
 
@@ -43,7 +53,7 @@
                         document.getElementById('films').appendChild(o)
                     })
             }
-            xhr.open("GET", "http://localhost:2230/films")
+            xhr.open("GET", "http://localhost:2200/films")
             xhr.send()
         }
         

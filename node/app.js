@@ -1,16 +1,20 @@
+// This module allows us to use a .env file to specify certain values
+// that we don't want to hard-code
+require("dotenv").config()
+
 const http = require('http')
 const URL = require('url')
 const qs = require('querystring')
 const mysql = require('mysql')
 
-const hostname = '127.0.0.1'
-const port = 2200
+const hostname = process.env.SERVER_HOSTNAME
+const port = process.env.SERVER_PORT
 
 const mysqlConnectionSettings = {
-    host : 'localhost',
-    user : '',             // Your database user name goes here
-    password : '',         // The password for your your database user goes here 
-    database : 'sakila'    // The name of the database you want to connect to
+    host : process.env.DB_HOSTNAME,
+    user : process.env.DB_USER,             // Your database user name goes here
+    password : process.env.DB_PASSWORD,     // The password for your your database user goes here 
+    database : process.env.DB_NAME          // The name of the database you want to connect to
 }
 
 // Set up an HTTP server using node's built-in http module
