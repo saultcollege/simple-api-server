@@ -148,12 +148,10 @@ function respondWithActors(cnx, res, lastNameFilter="", firstNameFilter="") {
     // ... END BAD CODE
 
     cnx.query(sql, function(err, results) {
+        cnx.end()
 
-        if ( err ) { 
-            throw err 
-        }
+        if ( err ) { throw err }
 
-        //cnx.end()
         respondJSON(res, results)
     })
 }
@@ -170,6 +168,8 @@ function respondWithFilms(cnx, res, titleFilter="") {
     }
 
     cnx.query(sql, (err, results) => {
+        cnx.end()
+
         if ( err ) { throw err }
 
         respondJSON(res, results)
@@ -185,14 +185,23 @@ function addActorWithFilms(cnx, res, postData) {
 
     // Open a transaction...
     cnx.beginTransaction( err => {
-        if ( err ) { throw err }
+
+        if ( err ) { 
+            cnx.end()
+            throw err 
+        }
 
         // First insert the new actor
         const sql = "INSERT INTO actor (first_name, last_name) VALUES (?, ?)"
         cnx.query(sql, [ postData.first_name, postData.last_name ], (err, results) => {
 
             // If there was a problem, roll back the transaction and quit
-            if ( err ) { return cnx.rollback(() => { throw err }) }
+            if ( err ) { 
+                return cnx.rollback(() => { 
+                    cnx.end()
+                    throw err 
+                }) 
+            }
 
             // The mysql module helpfully gives us the id of the newly inserted object
             const actorId = results.insertId
@@ -209,17 +218,27 @@ function addActorWithFilms(cnx, res, postData) {
             cnx.query(filmSQL, (err) => {
                 
                 // Again, if there was a problem, roll back the transaction and quit
-                if ( err ) { return cnx.rollback(() => { throw err }) }
+                if ( err ) { 
+                    return cnx.rollback(() => { 
+                        cnx.end()
+                        throw err 
+                    }) 
+                }
 
                 // If we get here, everything went well and we can commit the transaction
                 cnx.commit( err => { 
 
                     // It's possible that the commit fails, in which case we still need to roll back
-                    if ( err ) { return cnx.rollback(() => { throw err }) }
+                    if ( err ) { 
+                        return cnx.rollback(() => { 
+                            cnx.end()
+                            throw err 
+                        }) 
+                    }
 
                     // At last, we can respond to the user that we have completed the addition
                     respondJSON(res, { actor_id: actorId, first_name: postData.first_name, last_name: postData.last_name })
-
+                    cnx.end()
                 })
             })
 
